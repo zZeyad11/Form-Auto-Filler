@@ -152,11 +152,12 @@ async function getActivePage(browser, timeout) {
             await timeout(1000);
 
             const data = await page.evaluate(() => document.querySelector('*').outerHTML);
-
-            if (data.includes(ExpectedMessage["ExpectedText"])) {
-                console.log("Done Row Num: " + CurrentRow);
-            } else {
-                console.log("Failed Row Num: " + CurrentRow);
+            if (ExpectedMessage["ExpectedText"] != '') {
+                if (data.includes(ExpectedMessage["ExpectedText"])) {
+                    console.log("Done Row Num: " + CurrentRow);
+                } else {
+                    console.log("Failed Row Num: " + CurrentRow);
+                }
             }
 
 
