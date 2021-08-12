@@ -141,6 +141,7 @@ async function getActivePage(browser, timeout) {
             await page.evaluate(`document.getElementById("g-recaptcha-response").innerHTML="${response}";`);
         } catch {
             console.log("Failed In Captcha solving of Row Num: " + CurrentRow);
+            await page.goto(Page_Url);
             continue;
         }
 
