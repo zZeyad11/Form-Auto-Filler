@@ -221,15 +221,16 @@ const waitTillHTMLRendered = async(page, timeout = 30000) => {
                     const data = (await page.evaluate(() => document.querySelector('*').outerHTML)).toString().toLowerCase();
 
                     var Bool = (data.includes("class=\"" + ExpectedMessage["ClassName"] + "\"") && data.includes("name=\"" + ExpectedMessage["Name"] + "\"") && data.includes("id=\"" + ExpectedMessage["ID"] + "\"")) || (data.includes("class=\"" + ExpectedMessage["ClassName"] + "\"") && data.includes("name=\"" + ExpectedMessage["Name"] + "\"")) || (data.includes("class=\"" + ExpectedMessage["ClassName"] + "\"") && data.includes("id=\"" + ExpectedMessage["ID"] + "\"")) || (data.includes("name=\"" + ExpectedMessage["Name"] + "\"") && data.includes("id=\"" + ExpectedMessage["ID"] + "\"")) || data.includes("class=\"" + ExpectedMessage["ClassName"] + "\"") || data.includes("id=\"" + ExpectedMessage["ID"] + "\"") || (data.includes("name=\"" + ExpectedMessage["Name"] + "\""));
-                    if (Bool) {
-                        if (data.includes(ExpectedMessage["ExpectedText"])) {
-                            console.log("Done Row Num: " + CurrentRow);
-                        } else {
-                            console.log("Failed Row Num: " + CurrentRow);
-                            continue;
-                        }
+
+                    if (data.includes(ExpectedMessage["ExpectedText"]) && Bool) {
+                        console.log("Done Row Num: " + CurrentRow);
+                    } else {
+                        console.log("Failed Row Num: " + CurrentRow);
+                        continue;
                     }
+
                 }
+
                 await timeout(parseInt(DelayTimeInSec) * 1000); //Waits for Time , Set in The json File
             } catch (exception) {
                 console.log("Failed In Captcha solving of Row Num: " + CurrentRow);
@@ -296,14 +297,14 @@ const waitTillHTMLRendered = async(page, timeout = 30000) => {
                     const data = (await page.evaluate(() => document.querySelector('*').outerHTML)).toString().toLowerCase();
 
                     var Bool = (data.includes("class=\"" + ExpectedMessage["ClassName"] + "\"") && data.includes("name=\"" + ExpectedMessage["Name"] + "\"") && data.includes("id=\"" + ExpectedMessage["ID"] + "\"")) || (data.includes("class=\"" + ExpectedMessage["ClassName"] + "\"") && data.includes("name=\"" + ExpectedMessage["Name"] + "\"")) || (data.includes("class=\"" + ExpectedMessage["ClassName"] + "\"") && data.includes("id=\"" + ExpectedMessage["ID"] + "\"")) || (data.includes("name=\"" + ExpectedMessage["Name"] + "\"") && data.includes("id=\"" + ExpectedMessage["ID"] + "\"")) || data.includes("class=\"" + ExpectedMessage["ClassName"] + "\"") || data.includes("id=\"" + ExpectedMessage["ID"] + "\"") || (data.includes("name=\"" + ExpectedMessage["Name"] + "\""));
-                    if (Bool) {
-                        if (data.includes(ExpectedMessage["ExpectedText"])) {
-                            console.log("Done Row Num: " + CurrentRow);
-                        } else {
-                            console.log("Failed Row Num: " + CurrentRow);
-                            continue;
-                        }
+
+                    if (data.includes(ExpectedMessage["ExpectedText"]) && Bool) {
+                        console.log("Done Row Num: " + CurrentRow);
+                    } else {
+                        console.log("Failed Row Num: " + CurrentRow);
+                        continue;
                     }
+
                 }
 
 
