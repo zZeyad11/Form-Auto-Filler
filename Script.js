@@ -16,6 +16,7 @@ var MaxSubmits = JsonData["MaxSubmits"];
 var StartingOffset = JsonData["StartingOffset"];
 var SubmitButton = JsonData["SubmitButton"];
 var ExpectedMessage = JsonData["ExpectedMessage"];
+var IsRandom = JsonData["Is_Random"];
 
 
 const chromeOptions = {
@@ -74,6 +75,7 @@ const timeout = millis => new Promise(resolve => setTimeout(resolve, millis));
 
 
 var arr = [];
+var RandomDone = [];
 var CurrentRow = 0; // Zero Equals The first Line using Zero-Indexing System based
 
 var stream = require("fs").createReadStream(CSV_File_Path);
@@ -99,6 +101,42 @@ async function getActivePage(browser, timeout) {
 }
 
 
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
+}
+
+const waitTillHTMLRendered = async(page, timeout = 30000) => {
+    const checkDurationMsecs = 1000;
+    const maxChecks = timeout / checkDurationMsecs;
+    let lastHTMLSize = 0;
+    let checkCounts = 1;
+    let countStableSizeIterations = 0;
+    const minStableSizeIterations = 3;
+
+    while (checkCounts++ <= maxChecks) {
+        let html = await page.content();
+        let currentHTMLSize = html.length;
+
+        let bodyHTMLSize = await page.evaluate(() => document.body.innerHTML.length);
+
+        // console.log('last: ', lastHTMLSize, ' <> curr: ', currentHTMLSize, " body html size: ", bodyHTMLSize);
+
+        if (lastHTMLSize != 0 && currentHTMLSize == lastHTMLSize)
+            countStableSizeIterations++;
+        else
+            countStableSizeIterations = 0; //reset the counter
+
+        if (countStableSizeIterations >= minStableSizeIterations) {
+            //  console.log("Page rendered fully..");
+            break;
+        }
+
+        lastHTMLSize = currentHTMLSize;
+        await page.waitFor(checkDurationMsecs);
+    }
+};
 
 (async function main() {
     const response = await request.post('http://2captcha.com/in.php', { form: formData });
@@ -109,66 +147,136 @@ async function getActivePage(browser, timeout) {
     // const page = await browser.newPage();
     const page = await getActivePage(browser, 1000);
     await page.goto(Page_Url);
-
     //Reads Each Row In 
-    for (let Q = 0; Q < arr.length; Q++) {
-        try {
-            CurrentRow = Q;
-            await page.goto(Page_Url);
-            //Type The data into its Fields According to The json File
-            var item = arr[Q];
-            if (CurrentRow < StartingOffset) {
-                continue;
-            }
-            if (MaxSubmits - 1 == CurrentRow) {
-                break;
-            }
-
-            //Fills The Data for The current Row
-            for (let AI = 0; AI < item.length; AI++) {
-
-                var ColumInfoClassAndID = Fields["Col" + AI];
-                var ColumInfoData = item[AI];
-                if (ColumInfoClassAndID != null) {
-                    var Selector = (ColumInfoClassAndID["ID"] == "" ? "" : ("#" + ColumInfoClassAndID["ID"])) + (ColumInfoClassAndID["ClassName"] == "" ? "" : ("." + ColumInfoClassAndID["ClassName"])) + (ColumInfoClassAndID["Name"] == "" ? "" : ("[name=\"" + ColumInfoClassAndID["Name"] + "\"]"));
-                    await page.type(Selector, ColumInfoData);
-                }
-            }
-
-            //Trying To Bypass CAPTCHAs 
+    if (!IsRandom) {
+        for (let Q = 0; Q < arr.length; Q++) {
             try {
-                const requestId = await initiateCaptchaRequest(API_Key);
-                const response = await pollForRequestResults(API_Key, requestId);
-                await page.evaluate(`document.getElementById("g-recaptcha-response").innerHTML="${response}";`);
-            } catch {
+                CurrentRow = Q;
+                await page.goto(Page_Url);
+                await waitTillHTMLRendered(page);
+                //Type The data into its Fields According to The json File
+                var item = arr[Q];
+                if (CurrentRow < StartingOffset) {
+                    continue;
+                }
+                if (MaxSubmits - 1 == CurrentRow) {
+                    break;
+                }
+
+                //Fills The Data for The current Row
+                for (let AI = 0; AI < item.length; AI++) {
+
+                    var ColumInfoClassAndID = Fields["Col" + AI];
+                    var ColumInfoData = item[AI];
+                    if (ColumInfoClassAndID != null) {
+                        var Selector = (ColumInfoClassAndID["ID"] == "" ? "" : ("#" + ColumInfoClassAndID["ID"])) + (ColumInfoClassAndID["ClassName"] == "" ? "" : ("." + ColumInfoClassAndID["ClassName"])) + (ColumInfoClassAndID["Name"] == "" ? "" : ("[name=\"" + ColumInfoClassAndID["Name"] + "\"]"));
+                        await page.type(Selector, ColumInfoData);
+                    }
+                }
+
+                //Trying To Bypass CAPTCHAs 
+                try {
+                    const requestId = await initiateCaptchaRequest(API_Key);
+                    const response = await pollForRequestResults(API_Key, requestId);
+                    await page.evaluate(`document.getElementById("g-recaptcha-response").innerHTML="${response}";`);
+                } catch {
+                    console.log("Failed In Captcha solving of Row Num: " + CurrentRow);
+                    Q--;
+                    continue;
+                }
+
+                //Click Sumbit Button
+                var ButtonSelector = (SubmitButton["ID"] == "" ? "" : ("#" + SubmitButton["ID"])) + (SubmitButton["ClassName"] == "" ? "" : ("." + SubmitButton["ClassName"])) + (SubmitButton["type"] == "" ? "" : ("[type=\"" + SubmitButton["type"] + "\"]"));
+                await page.click(ButtonSelector);
+                await timeout(1000);
+                await waitTillHTMLRendered(page);
+                var data = await page.evaluate(() => document.querySelector('*').outerHTML);
+                if (ExpectedMessage["ExpectedText"] != '') {
+                    if (data.includes(ExpectedMessage["ExpectedText"])) {
+                        console.log("Done Row Num: " + CurrentRow);
+                    } else {
+                        console.log("Failed Row Num: " + CurrentRow);
+                        continue;
+                    }
+                }
+
+
+                data = '';
+                await timeout(parseInt(DelayTimeInSec) * 1000); //Waits for Time , Set in The json File
+            } catch (exception) {
                 console.log("Failed In Captcha solving of Row Num: " + CurrentRow);
+                console.log(exception.stack);
+                console.log(exception.message);
                 Q--;
                 continue;
             }
-
-            //Click Sumbit Button
-            var ButtonSelector = (SubmitButton["ID"] == "" ? "" : ("#" + SubmitButton["ID"])) + (SubmitButton["ClassName"] == "" ? "" : ("." + SubmitButton["ClassName"])) + (SubmitButton["type"] == "" ? "" : ("[type=\"" + SubmitButton["type"] + "\"]"));
-            await page.click(ButtonSelector);
-            await timeout(1000);
-
-            const data = await page.evaluate(() => document.querySelector('*').outerHTML);
-            if (ExpectedMessage["ExpectedText"] != '') {
-                if (data.includes(ExpectedMessage["ExpectedText"])) {
-                    console.log("Done Row Num: " + CurrentRow);
-                } else {
-                    console.log("Failed Row Num: " + CurrentRow);
+        }
+    } else {
+        while (RandomDone.length <= parseInt(MaxSubmits)) {
+            try {
+                var Q = 0;
+                while (RandomDone.includes(Q)) {
+                    Q = getRandomInt(0, arr.length);
                 }
+                CurrentRow = Q;
+                await page.goto(Page_Url);
+                await waitTillHTMLRendered(page);
+                //Type The data into its Fields According to The json File
+                var item = arr[Q];
+                if (CurrentRow < StartingOffset) {
+                    continue;
+                }
+
+                //Fills The Data for The current Row
+                for (let AI = 0; AI < item.length; AI++) {
+
+                    var ColumInfoClassAndID = Fields["Col" + AI];
+                    var ColumInfoData = item[AI];
+                    if (ColumInfoClassAndID != null) {
+                        var Selector = (ColumInfoClassAndID["ID"] == "" ? "" : ("#" + ColumInfoClassAndID["ID"])) + (ColumInfoClassAndID["ClassName"] == "" ? "" : ("." + ColumInfoClassAndID["ClassName"])) + (ColumInfoClassAndID["Name"] == "" ? "" : ("[name=\"" + ColumInfoClassAndID["Name"] + "\"]"));
+                        await page.type(Selector, ColumInfoData);
+                    }
+                }
+
+                //Trying To Bypass CAPTCHAs 
+                try {
+                    const requestId = await initiateCaptchaRequest(API_Key);
+                    const response = await pollForRequestResults(API_Key, requestId);
+                    await page.evaluate(`document.getElementById("g-recaptcha-response").innerHTML="${response}";`);
+                } catch {
+                    console.log("Failed In Captcha solving of Row Num: " + CurrentRow);
+                    continue;
+                }
+
+                //Click Sumbit Button
+                var ButtonSelector = (SubmitButton["ID"] == "" ? "" : ("#" + SubmitButton["ID"])) + (SubmitButton["ClassName"] == "" ? "" : ("." + SubmitButton["ClassName"])) + (SubmitButton["type"] == "" ? "" : ("[type=\"" + SubmitButton["type"] + "\"]"));
+                await page.click(ButtonSelector);
+                await timeout(1000);
+
+                await waitTillHTMLRendered(page);
+
+                var data = await page.evaluate(() => document.querySelector('*').outerHTML);
+                if (ExpectedMessage["ExpectedText"] != '') {
+                    if (data.includes(ExpectedMessage["ExpectedText"])) {
+                        console.log("Done Row Num: " + CurrentRow);
+                    } else {
+                        console.log("Failed Row Num: " + CurrentRow);
+                        continue;
+                    }
+                }
+
+                data = '';
+                RandomDone.push(Q);
+                await timeout(parseInt(DelayTimeInSec) * 1000); //Waits for Time , Set in The json File
+            } catch (exception) {
+                console.log("Failed In Captcha solving of Row Num: " + CurrentRow);
+                console.log(exception.stack);
+                console.log(exception.message);
+                Q--;
+                continue;
             }
-
-
-            CurrentRow++;
-            await timeout(parseInt(DelayTimeInSec) * 1000); //Waits for Time , Set in The json File
-        } catch (exception) {
-            console.log("Failed In Captcha solving of Row Num: " + CurrentRow);
-            console.log(exception.stack);
-            console.log(exception.message);
-            Q--;
-            continue;
         }
     }
+
+
 })();

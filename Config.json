@@ -6,6 +6,7 @@
     "DelayTimeInSec": 10,
     "MaxSubmits": 10,
     "StartingOffset": 0,
+    "Is_Random": true,
     "Fields": {
         "Col0": {
             "ClassName": "",
