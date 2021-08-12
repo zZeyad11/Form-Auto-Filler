@@ -12,7 +12,7 @@ var API_Key = JsonData["API_Key"];
 var CSV_File_Path = JsonData["CSV_File_Path"];
 var Fields = JsonData["Fields"];
 var DelayTimeInSec = JsonData["DelayTimeInSec"];
-var MaxSumbits = JsonData["MaxSubmits"];
+var MaxSubmits = JsonData["MaxSubmits"];
 var StartingOffset = JsonData["StartingOffset"];
 var SubmitButton = JsonData["SubmitButton"];
 var ExpectedMessage = JsonData["ExpectedMessage"];
@@ -112,56 +112,61 @@ async function getActivePage(browser, timeout) {
 
     //Reads Each Row In 
     for (let Q = 0; Q < arr.length; Q++) {
-        var itemNumb = arr[Q];
-        //Type The data into its Fields According to The json File
-        var item = arr[itemNumb];
-        if (CurrentRow < StartingOffset) {
-            CurrentRow++;
-            continue;
-        }
-        if (MaxSumbits - 1 == CurrentRow) {
-            break;
-        }
-
-        //Fills The Data for The current Row
-        for (let AI = 0; AI < item.length; AI++) {
-
-            var ColumInfoClassAndID = Fields["Col" + AI];
-            var ColumInfoData = item[AI];
-            if (ColumInfoClassAndID != null) {
-                var Selector = (ColumInfoClassAndID["ID"] == "" ? "" : ("#" + ColumInfoClassAndID["ID"])) + (ColumInfoClassAndID["ClassName"] == "" ? "" : ("." + ColumInfoClassAndID["ClassName"])) + (ColumInfoClassAndID["Name"] == "" ? "" : ("[name=\"" + ColumInfoClassAndID["Name"] + "\"]"));
-                await page.type(Selector, ColumInfoData);
-            }
-        }
-
-        //Trying To Bypass CAPTCHAs 
         try {
-            const requestId = await initiateCaptchaRequest(API_Key);
-            const response = await pollForRequestResults(API_Key, requestId);
-            await page.evaluate(`document.getElementById("g-recaptcha-response").innerHTML="${response}";`);
+            await page.goto(Page_Url);
+            var itemNumb = arr[Q];
+            //Type The data into its Fields According to The json File
+            var item = arr[itemNumb];
+            if (CurrentRow < StartingOffset) {
+                CurrentRow++;
+                continue;
+            }
+            if (MaxSubmits - 1 == CurrentRow) {
+                break;
+            }
+
+            //Fills The Data for The current Row
+            for (let AI = 0; AI < item.length; AI++) {
+
+                var ColumInfoClassAndID = Fields["Col" + AI];
+                var ColumInfoData = item[AI];
+                if (ColumInfoClassAndID != null) {
+                    var Selector = (ColumInfoClassAndID["ID"] == "" ? "" : ("#" + ColumInfoClassAndID["ID"])) + (ColumInfoClassAndID["ClassName"] == "" ? "" : ("." + ColumInfoClassAndID["ClassName"])) + (ColumInfoClassAndID["Name"] == "" ? "" : ("[name=\"" + ColumInfoClassAndID["Name"] + "\"]"));
+                    await page.type(Selector, ColumInfoData);
+                }
+            }
+
+            //Trying To Bypass CAPTCHAs 
+            try {
+                const requestId = await initiateCaptchaRequest(API_Key);
+                const response = await pollForRequestResults(API_Key, requestId);
+                await page.evaluate(`document.getElementById("g-recaptcha-response").innerHTML="${response}";`);
+            } catch {
+                console.log("Failed In Captcha solving of Row Num: " + CurrentRow);
+                Q--;
+                continue;
+            }
+
+            //Click Sumbit Button
+            var ButtonSelector = (SubmitButton["ID"] == "" ? "" : ("#" + SubmitButton["ID"])) + (SubmitButton["ClassName"] == "" ? "" : ("." + SubmitButton["ClassName"])) + (SubmitButton["type"] == "" ? "" : ("[type=\"" + SubmitButton["type"] + "\"]"));
+            await page.click(ButtonSelector);
+            await timeout(1000);
+
+            const data = await page.evaluate(() => document.querySelector('*').outerHTML);
+
+            if (data.includes(ExpectedMessage["ExpectedText"])) {
+                console.log("Done Row Num: " + CurrentRow);
+            } else {
+                console.log("Failed Row Num: " + CurrentRow);
+            }
+
+
+            CurrentRow++;
+            await timeout(parseInt(DelayTimeInSec) * 1000); //Waits for Time , Set in The json File
         } catch {
             console.log("Failed In Captcha solving of Row Num: " + CurrentRow);
-            await page.goto(Page_Url);
             Q--;
             continue;
         }
-
-        //Click Sumbit Button
-        var ButtonSelector = (SubmitButton["ID"] == "" ? "" : ("#" + SubmitButton["ID"])) + (SubmitButton["ClassName"] == "" ? "" : ("." + SubmitButton["ClassName"])) + (SubmitButton["type"] == "" ? "" : ("[type=\"" + SubmitButton["type"] + "\"]"));
-        await page.click(ButtonSelector);
-        await timeout(1000);
-
-        const data = await page.evaluate(() => document.querySelector('*').outerHTML);
-
-        if (data.includes(ExpectedMessage["ExpectedText"])) {
-            console.log("Done Row Num: " + CurrentRow);
-        } else {
-            console.log("Failed Row Num: " + CurrentRow);
-        }
-
-
-        CurrentRow++;
-        await page.goto(Page_Url);
-        await timeout(parseInt(DelayTimeInSec) * 1000); //Waits for Time , Set in The json File
     }
 })();
