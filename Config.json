@@ -41,7 +41,7 @@
     },
     "ExpectedMessage": {
         "ExpectedText": "Thanks for contacting us! We will get in touch with you shortly.",
-        "ClassName": "",
+        "ClassName": "shortcode-wrapper shortcode-title clearfix",
         "ID": "",
         "Name": ""
     }

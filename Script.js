@@ -109,25 +109,24 @@ function getRandomInt(min, max) {
 
 var GlobalDebug = (function() {
     var savedConsole = console;
-    return function(debugOn, suppressAll) {
-        var suppress = suppressAll || false;
-        if (debugOn === false) {
-            console = {};
-            console.log = function() {};
-            if (suppress) {
-                console.info = function() {};
-                console.warn = function() {};
-                console.error = function() {};
-            } else {
-                console.info = savedConsole.info;
-                console.warn = savedConsole.warn;
-                console.error = savedConsole.error;
-            }
-        } else {
-            console = savedConsole;
+    console = {};
+    console.log = function(message) {
+        if (!message.includes('waitFor')) {
+            savedConsole.log(message);
         }
-    }
-})();
+    };
+    console.warn = function(message) {
+        if (!message.includes('waitFor')) {
+            savedConsole.warn(message);
+        }
+    };
+
+    console.error = function(message) {
+        if (!message.includes('waitFor')) {
+            savedConsole.error(message);
+        }
+    };
+});
 
 
 const waitTillHTMLRendered = async(page, timeout = 30000) => {
@@ -163,8 +162,8 @@ const waitTillHTMLRendered = async(page, timeout = 30000) => {
 
 (async function main() {
     const response = await request.post('http://2captcha.com/in.php', { form: formData });
-    GlobalDebug(true);
-
+    //GlobalDebug(false);
+    GlobalDebug();
 
     const browser = await puppeteer.launch(chromeOptions);
     // const page = await browser.newPage();
@@ -176,7 +175,9 @@ const waitTillHTMLRendered = async(page, timeout = 30000) => {
             try {
                 CurrentRow = Q;
                 await page.goto(Page_Url);
+                //GlobalDebug(false);
                 await waitTillHTMLRendered(page);
+                //GlobalDebug(true);
                 //Type The data into its Fields According to The json File
                 var item = arr[Q];
                 if (CurrentRow < StartingOffset) {
@@ -212,17 +213,21 @@ const waitTillHTMLRendered = async(page, timeout = 30000) => {
                 var ButtonSelector = (SubmitButton["ID"] == "" ? "" : ("#" + SubmitButton["ID"])) + (SubmitButton["ClassName"] == "" ? "" : ("." + SubmitButton["ClassName"])) + (SubmitButton["type"] == "" ? "" : ("[type=\"" + SubmitButton["type"] + "\"]"));
                 await page.click(ButtonSelector);
                 await timeout(1000);
-                GlobalDebug(false);
+                //GlobalDebug(false);
                 await waitTillHTMLRendered(page);
-                GlobalDebug(true);
+                //GlobalDebug(true);
+
                 if (ExpectedMessage["ExpectedText"] != '') {
-                    var Selector = (ExpectedMessage["ID"] == "" ? "" : ("#" + ExpectedMessage["ID"])) + (ExpectedMessage["ClassName"] == "" ? "" : ("." + ExpectedMessage["ClassName"])) + (ExpectedMessage["Name"] == "" ? "" : ("[name=\"" + ExpectedMessage["Name"] + "\"]"));
-                    var text = await page.evaluate(() => Array.from(document.querySelectorAll(Selector), element => element.textContent));
-                    if (text.includes(ExpectedMessage["ExpectedText"])) {
-                        console.log("Done Row Num: " + CurrentRow);
-                    } else {
-                        console.log("Failed Row Num: " + CurrentRow);
-                        continue;
+                    const data = (await page.evaluate(() => document.querySelector('*').outerHTML)).toString().toLowerCase();
+
+                    var Bool = (data.includes("class=\"" + ExpectedMessage["ClassName"] + "\"") && data.includes("name=\"" + ExpectedMessage["Name"] + "\"") && data.includes("id=\"" + ExpectedMessage["ID"] + "\"")) || (data.includes("class=\"" + ExpectedMessage["ClassName"] + "\"") && data.includes("name=\"" + ExpectedMessage["Name"] + "\"")) || (data.includes("class=\"" + ExpectedMessage["ClassName"] + "\"") && data.includes("id=\"" + ExpectedMessage["ID"] + "\"")) || (data.includes("name=\"" + ExpectedMessage["Name"] + "\"") && data.includes("id=\"" + ExpectedMessage["ID"] + "\"")) || data.includes("class=\"" + ExpectedMessage["ClassName"] + "\"") || data.includes("id=\"" + ExpectedMessage["ID"] + "\"") || (data.includes("name=\"" + ExpectedMessage["Name"] + "\""));
+                    if (Bool) {
+                        if (data.includes(ExpectedMessage["ExpectedText"])) {
+                            console.log("Done Row Num: " + CurrentRow);
+                        } else {
+                            console.log("Failed Row Num: " + CurrentRow);
+                            continue;
+                        }
                     }
                 }
                 await timeout(parseInt(DelayTimeInSec) * 1000); //Waits for Time , Set in The json File
@@ -243,7 +248,12 @@ const waitTillHTMLRendered = async(page, timeout = 30000) => {
                 }
                 CurrentRow = Q;
                 await page.goto(Page_Url);
+                //GlobalDebug(false);
                 await waitTillHTMLRendered(page);
+
+
+
+                //GlobalDebug(true);
                 //Type The data into its Fields According to The json File
                 var item = arr[Q];
                 if (CurrentRow < StartingOffset) {
@@ -276,19 +286,23 @@ const waitTillHTMLRendered = async(page, timeout = 30000) => {
                 await page.click(ButtonSelector);
                 await timeout(1000);
 
-                GlobalDebug(false);
+                //GlobalDebug(false);
                 await waitTillHTMLRendered(page);
-                GlobalDebug(true);
+                //GlobalDebug(true);
+
 
 
                 if (ExpectedMessage["ExpectedText"] != '') {
-                    var Selector = (ExpectedMessage["ID"] == "" ? "" : ("#" + ExpectedMessage["ID"])) + (ExpectedMessage["ClassName"] == "" ? "" : ("." + ExpectedMessage["ClassName"])) + (ExpectedMessage["Name"] == "" ? "" : ("[name=\"" + ExpectedMessage["Name"] + "\"]"));
-                    var text = await page.evaluate(() => Array.from(document.querySelectorAll(Selector), element => element.textContent));
-                    if (text.includes(ExpectedMessage["ExpectedText"])) {
-                        console.log("Done Row Num: " + CurrentRow);
-                    } else {
-                        console.log("Failed Row Num: " + CurrentRow);
-                        continue;
+                    const data = (await page.evaluate(() => document.querySelector('*').outerHTML)).toString().toLowerCase();
+
+                    var Bool = (data.includes("class=\"" + ExpectedMessage["ClassName"] + "\"") && data.includes("name=\"" + ExpectedMessage["Name"] + "\"") && data.includes("id=\"" + ExpectedMessage["ID"] + "\"")) || (data.includes("class=\"" + ExpectedMessage["ClassName"] + "\"") && data.includes("name=\"" + ExpectedMessage["Name"] + "\"")) || (data.includes("class=\"" + ExpectedMessage["ClassName"] + "\"") && data.includes("id=\"" + ExpectedMessage["ID"] + "\"")) || (data.includes("name=\"" + ExpectedMessage["Name"] + "\"") && data.includes("id=\"" + ExpectedMessage["ID"] + "\"")) || data.includes("class=\"" + ExpectedMessage["ClassName"] + "\"") || data.includes("id=\"" + ExpectedMessage["ID"] + "\"") || (data.includes("name=\"" + ExpectedMessage["Name"] + "\""));
+                    if (Bool) {
+                        if (data.includes(ExpectedMessage["ExpectedText"])) {
+                            console.log("Done Row Num: " + CurrentRow);
+                        } else {
+                            console.log("Failed Row Num: " + CurrentRow);
+                            continue;
+                        }
                     }
                 }
 
