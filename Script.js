@@ -163,8 +163,10 @@ async function getActivePage(browser, timeout) {
 
             CurrentRow++;
             await timeout(parseInt(DelayTimeInSec) * 1000); //Waits for Time , Set in The json File
-        } catch {
+        } catch (exception) {
             console.log("Failed In Captcha solving of Row Num: " + CurrentRow);
+            console.log(exception.stack);
+            console.log(exception.message);
             Q--;
             continue;
         }
