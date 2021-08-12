@@ -111,8 +111,8 @@ async function getActivePage(browser, timeout) {
     await page.goto(Page_Url);
 
     //Reads Each Row In 
-    for (var itemNumb in arr) {
-
+    for (let Q = 0; Q < arr.length; Q++) {
+        var itemNumb = arr[Q];
         //Type The data into its Fields According to The json File
         var item = arr[itemNumb];
         if (CurrentRow < StartingOffset) {
@@ -142,6 +142,7 @@ async function getActivePage(browser, timeout) {
         } catch {
             console.log("Failed In Captcha solving of Row Num: " + CurrentRow);
             await page.goto(Page_Url);
+            Q--;
             continue;
         }
 
