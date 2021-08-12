@@ -1,1 +1,1 @@
-node Script.js
+node --trace-warnings Script.js

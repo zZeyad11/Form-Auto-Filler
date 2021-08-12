@@ -112,7 +112,7 @@ async function getActivePage(browser, timeout) {
 
     //Reads Each Row In 
     for (var itemNumb in arr) {
-        const requestId = await initiateCaptchaRequest(API_Key);
+
         //Type The data into its Fields According to The json File
         var item = arr[itemNumb];
         if (CurrentRow < StartingOffset) {
@@ -135,9 +135,14 @@ async function getActivePage(browser, timeout) {
         }
 
         //Trying To Bypass CAPTCHAs 
-        const response = await pollForRequestResults(API_Key, requestId);
-
-        await page.evaluate(`document.getElementById("g-recaptcha-response").innerHTML="${response}";`);
+        try {
+            const requestId = await initiateCaptchaRequest(API_Key);
+            const response = await pollForRequestResults(API_Key, requestId);
+            await page.evaluate(`document.getElementById("g-recaptcha-response").innerHTML="${response}";`);
+        } catch {
+            console.log("Failed In Captcha solving of Row Num: " + CurrentRow);
+            continue;
+        }
 
         //Click Sumbit Button
         var ButtonSelector = (SubmitButton["ID"] == "" ? "" : ("#" + SubmitButton["ID"])) + (SubmitButton["ClassName"] == "" ? "" : ("." + SubmitButton["ClassName"])) + (SubmitButton["type"] == "" ? "" : ("[type=\"" + SubmitButton["type"] + "\"]"));
