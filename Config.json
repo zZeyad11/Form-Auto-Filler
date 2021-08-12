@@ -39,10 +39,6 @@
         "type": "Submit"
     },
     "ExpectedMessage": {
-        "ClassName": "gform_confirmation_message_1.gform_confirmation_message",
-        "ID": "gform_confirmation_message_1",
-        "Name": "",
-        "TagName": "",
         "ExpectedText": "Thanks for contacting us! We will get in touch with you shortly."
     }
 }
