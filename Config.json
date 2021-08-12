@@ -40,6 +40,9 @@
         "type": "Submit"
     },
     "ExpectedMessage": {
-        "ExpectedText": "Thanks for contacting us! We will get in touch with you shortly."
+        "ExpectedText": "Thanks for contacting us! We will get in touch with you shortly.",
+        "ClassName": "",
+        "ID": "",
+        "Name": ""
     }
 }
