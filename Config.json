@@ -1,0 +1,43 @@
+{
+    "Page_Url": "https://contactusinc.com/contact-us/",
+    "Site_Key": "6LducF0UAAAAAFnMA7R49zyOhFWKCWV7N0uwTT0Z",
+    "API_Key": "",
+    "CSV_File_Path": "Ex1.csv",
+    "DelayTimeInSec": 10,
+    "MaxSumbit": 10,
+    "StartingOffset": 0,
+    "Fields": {
+        "Col0": {
+            "ClassName": "",
+            "ID": "input_1_1_3",
+            "Name": "input_1.3"
+        },
+        "Col1": {
+            "ClassName": "",
+            "ID": "input_1_2",
+            "Name": "input_2"
+        },
+        "Col2": {
+            "ClassName": "",
+            "ID": "input_1_8",
+            "Name": "input_8"
+        },
+        "Col3": {
+            "ClassName": "",
+            "ID": "input_1_11",
+            "Name": "input_11"
+        }
+    },
+    "SubmitButton": {
+        "ClassName": "",
+        "ID": "gform_submit_button_1",
+        "type": "Submit"
+    },
+    "ExpectedMessage": {
+        "ClassName": "",
+        "ID": "",
+        "Name": "",
+        "TagName": "",
+        "ExpectedText": "Success"
+    }
+}
