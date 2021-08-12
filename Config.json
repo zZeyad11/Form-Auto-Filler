@@ -1,7 +1,7 @@
 {
     "Page_Url": "https://contactusinc.com/contact-us/",
-    "Site_Key": "",
-    "API_Key": "",
+    "Site_Key": "6LducF0UAAAAAFnMA7R49zyOhFWKCWV7N0uwTT0Z",
+    "API_Key": "d7480b5c087584576717b8b20e2e8c92",
     "CSV_File_Path": "Ex1.csv",
     "DelayTimeInSec": 10,
     "MaxSumbit": 10,
@@ -26,6 +26,11 @@
             "ClassName": "",
             "ID": "input_1_11",
             "Name": "input_11"
+        },
+        "Col4": {
+            "ClassName": "",
+            "ID": "input_1_9",
+            "Name": "input_9"
         }
     },
     "SubmitButton": {
@@ -34,10 +39,10 @@
         "type": "Submit"
     },
     "ExpectedMessage": {
-        "ClassName": "",
-        "ID": "",
+        "ClassName": "gform_confirmation_message_1.gform_confirmation_message",
+        "ID": "gform_confirmation_message_1",
         "Name": "",
         "TagName": "",
-        "ExpectedText": "Success"
+        "ExpectedText": "Thanks for contacting us! We will get in touch with you shortly."
     }
 }

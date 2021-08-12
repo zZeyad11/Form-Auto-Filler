@@ -12,7 +12,7 @@ var API_Key = JsonData["API_Key"];
 var CSV_File_Path = JsonData["CSV_File_Path"];
 var Fields = JsonData["Fields"];
 var DelayTimeInSec = JsonData["DelayTimeInSec"];
-var MaxSumbits = JsonData["MaxSumbit"];
+var MaxSumbits = JsonData["MaxSubmits"];
 var StartingOffset = JsonData["StartingOffset"];
 var SubmitButton = JsonData["SubmitButton"];
 var ExpectedMessage = JsonData["ExpectedMessage"];
@@ -83,8 +83,20 @@ reader.on("line", (row) => {
     arr.push(a);
 });
 
-
-
+async function getActivePage(browser, timeout) {
+    var start = new Date().getTime();
+    while (new Date().getTime() - start < timeout) {
+        var pages = await browser.pages();
+        var arr = [];
+        for (const p of pages) {
+            if (await p.evaluate(() => { return document.visibilityState == 'visible' })) {
+                arr.push(p);
+            }
+        }
+        if (arr.length == 1) return arr[0];
+    }
+    throw "Unable to get active page";
+}
 
 
 
@@ -94,7 +106,8 @@ reader.on("line", (row) => {
 
 
     const browser = await puppeteer.launch(chromeOptions);
-    const page = await browser.newPage();
+    // const page = await browser.newPage();
+    const page = await getActivePage(browser, 1000);
     await page.goto(Page_Url);
 
     //Reads Each Row In 
@@ -126,29 +139,14 @@ reader.on("line", (row) => {
 
         await page.evaluate(`document.getElementById("g-recaptcha-response").innerHTML="${response}";`);
 
-        console.log("Finshd , Clicking Submit");
         //Click Sumbit Button
         var ButtonSelector = (SubmitButton["ID"] == "" ? "" : ("#" + SubmitButton["ID"])) + (SubmitButton["ClassName"] == "" ? "" : ("." + SubmitButton["ClassName"])) + (SubmitButton["type"] == "" ? "" : ("[type=\"" + SubmitButton["type"] + "\"]"));
         await page.click(ButtonSelector);
         await timeout(1000);
 
-        const Texts = await page.$$eval(ExpectedMessage["TagName"], elements => elements.map((el) => {
-            var ClassBool = ExpectedMessage["ClassName"] == '' ? null : el.getAttribute("ClassName") == ExpectedMessage["ClassName"];
-            var IDBool = ExpectedMessage["ID"] == '' ? null : el.getAttribute("ID") == ExpectedMessage["ID"];
-            var NameBool = ExpectedMessage["Name"] == '' ? null : el.getAttribute("Name") == ExpectedMessage["Name"];
-            var TagBool = ExpectedMessage["TagName"] == '' ? null : el.tagName == ExpectedMessage["TagName"];
+        const data = await page.evaluate(() => document.querySelector('*').outerHTML);
 
-            ClassBool = ClassBool == null ? true : ClassBool;
-            IDBool = IDBool == null ? true : IDBool;
-            NameBool = NameBool == null ? true : NameBool;
-            TagBool = TagBool == null ? true : TagBool;
-
-            if (ClassBool && IDBool && NameBool && TagBool) {
-                return el.textContent;
-            }
-        }));
-
-        if (Texts.includes(ExpectedMessage["ExpectedText"])) {
+        if (data.includes(ExpectedMessage["ExpectedText"])) {
             console.log("Done Row Num: " + CurrentRow);
         } else {
             console.log("Failed Row Num: " + CurrentRow);
