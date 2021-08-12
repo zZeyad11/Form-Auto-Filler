@@ -113,12 +113,11 @@ async function getActivePage(browser, timeout) {
     //Reads Each Row In 
     for (let Q = 0; Q < arr.length; Q++) {
         try {
+            CurrentRow = Q;
             await page.goto(Page_Url);
-            var itemNumb = arr[Q];
             //Type The data into its Fields According to The json File
-            var item = arr[itemNumb];
+            var item = arr[Q];
             if (CurrentRow < StartingOffset) {
-                CurrentRow++;
                 continue;
             }
             if (MaxSubmits - 1 == CurrentRow) {
