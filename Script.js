@@ -107,6 +107,29 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
 }
 
+var GlobalDebug = (function() {
+    var savedConsole = console;
+    return function(debugOn, suppressAll) {
+        var suppress = suppressAll || false;
+        if (debugOn === false) {
+            console = {};
+            console.log = function() {};
+            if (suppress) {
+                console.info = function() {};
+                console.warn = function() {};
+                console.error = function() {};
+            } else {
+                console.info = savedConsole.info;
+                console.warn = savedConsole.warn;
+                console.error = savedConsole.error;
+            }
+        } else {
+            console = savedConsole;
+        }
+    }
+})();
+
+
 const waitTillHTMLRendered = async(page, timeout = 30000) => {
     const checkDurationMsecs = 1000;
     const maxChecks = timeout / checkDurationMsecs;
@@ -140,7 +163,7 @@ const waitTillHTMLRendered = async(page, timeout = 30000) => {
 
 (async function main() {
     const response = await request.post('http://2captcha.com/in.php', { form: formData });
-
+    GlobalDebug(true);
 
 
     const browser = await puppeteer.launch(chromeOptions);
@@ -189,19 +212,19 @@ const waitTillHTMLRendered = async(page, timeout = 30000) => {
                 var ButtonSelector = (SubmitButton["ID"] == "" ? "" : ("#" + SubmitButton["ID"])) + (SubmitButton["ClassName"] == "" ? "" : ("." + SubmitButton["ClassName"])) + (SubmitButton["type"] == "" ? "" : ("[type=\"" + SubmitButton["type"] + "\"]"));
                 await page.click(ButtonSelector);
                 await timeout(1000);
+                GlobalDebug(false);
                 await waitTillHTMLRendered(page);
-                var data = await page.evaluate(() => document.querySelector('*').outerHTML);
+                GlobalDebug(true);
                 if (ExpectedMessage["ExpectedText"] != '') {
-                    if (data.includes(ExpectedMessage["ExpectedText"])) {
+                    var Selector = (ExpectedMessage["ID"] == "" ? "" : ("#" + ExpectedMessage["ID"])) + (ExpectedMessage["ClassName"] == "" ? "" : ("." + ExpectedMessage["ClassName"])) + (ExpectedMessage["Name"] == "" ? "" : ("[name=\"" + ExpectedMessage["Name"] + "\"]"));
+                    var text = await page.evaluate(() => Array.from(document.querySelectorAll(Selector), element => element.textContent));
+                    if (text.includes(ExpectedMessage["ExpectedText"])) {
                         console.log("Done Row Num: " + CurrentRow);
                     } else {
                         console.log("Failed Row Num: " + CurrentRow);
                         continue;
                     }
                 }
-
-
-                data = '';
                 await timeout(parseInt(DelayTimeInSec) * 1000); //Waits for Time , Set in The json File
             } catch (exception) {
                 console.log("Failed In Captcha solving of Row Num: " + CurrentRow);
@@ -253,11 +276,15 @@ const waitTillHTMLRendered = async(page, timeout = 30000) => {
                 await page.click(ButtonSelector);
                 await timeout(1000);
 
+                GlobalDebug(false);
                 await waitTillHTMLRendered(page);
+                GlobalDebug(true);
 
-                var data = await page.evaluate(() => document.querySelector('*').outerHTML);
+
                 if (ExpectedMessage["ExpectedText"] != '') {
-                    if (data.includes(ExpectedMessage["ExpectedText"])) {
+                    var Selector = (ExpectedMessage["ID"] == "" ? "" : ("#" + ExpectedMessage["ID"])) + (ExpectedMessage["ClassName"] == "" ? "" : ("." + ExpectedMessage["ClassName"])) + (ExpectedMessage["Name"] == "" ? "" : ("[name=\"" + ExpectedMessage["Name"] + "\"]"));
+                    var text = await page.evaluate(() => Array.from(document.querySelectorAll(Selector), element => element.textContent));
+                    if (text.includes(ExpectedMessage["ExpectedText"])) {
                         console.log("Done Row Num: " + CurrentRow);
                     } else {
                         console.log("Failed Row Num: " + CurrentRow);
@@ -265,7 +292,7 @@ const waitTillHTMLRendered = async(page, timeout = 30000) => {
                     }
                 }
 
-                data = '';
+
                 RandomDone.push(Q);
                 await timeout(parseInt(DelayTimeInSec) * 1000); //Waits for Time , Set in The json File
             } catch (exception) {
