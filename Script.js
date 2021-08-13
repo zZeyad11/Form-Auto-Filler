@@ -128,14 +128,13 @@ const waitTillHTMLRendered = async(page, timeout = 30000) => {
     if (!IsRandom) {
         for (let Q = 0; Q < arr.length; Q++) {
             try {
-
+                CurrentRow = Q;
                 if (CurrentRow < StartingOffset) {
                     continue;
                 }
                 if (MaxSubmits - 1 == CurrentRow) {
                     break;
                 }
-                CurrentRow = Q;
                 await page.goto(Page_Url);
                 await waitTillHTMLRendered(page);
                 var item = arr[Q];
