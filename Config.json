@@ -12,31 +12,36 @@
             "ClassName": "",
             "ID": "input_1_1_3",
             "Name": "input_1.3",
-            "Type": ""
+            "Type": "",
+            "TagName": "div"
         },
         "Col1": {
             "ClassName": "",
             "ID": "input_1_2",
             "Name": "input_2",
-            "Type": ""
+            "Type": "",
+            "TagName": "div"
         },
         "Col2": {
             "ClassName": "",
             "ID": "input_1_8",
             "Name": "input_8",
-            "Type": ""
+            "Type": "",
+            "TagName": "div"
         },
         "Col3": {
             "ClassName": "",
             "ID": "input_1_11",
             "Name": "input_11",
-            "Type": ""
+            "Type": "",
+            "TagName": "div"
         },
         "Col4": {
             "ClassName": "",
             "ID": "input_1_9",
             "Name": "input_9",
-            "Type": ""
+            "Type": "",
+            "TagName": "div"
         }
     },
     "SubmitButton": {
