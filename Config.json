@@ -11,27 +11,32 @@
         "Col0": {
             "ClassName": "",
             "ID": "input_1_1_3",
-            "Name": "input_1.3"
+            "Name": "input_1.3",
+            "Type": ""
         },
         "Col1": {
             "ClassName": "",
             "ID": "input_1_2",
-            "Name": "input_2"
+            "Name": "input_2",
+            "Type": ""
         },
         "Col2": {
             "ClassName": "",
             "ID": "input_1_8",
-            "Name": "input_8"
+            "Name": "input_8",
+            "Type": ""
         },
         "Col3": {
             "ClassName": "",
             "ID": "input_1_11",
-            "Name": "input_11"
+            "Name": "input_11",
+            "Type": ""
         },
         "Col4": {
             "ClassName": "",
             "ID": "input_1_9",
-            "Name": "input_9"
+            "Name": "input_9",
+            "Type": ""
         }
     },
     "SubmitButton": {
@@ -40,9 +45,9 @@
         "type": "Submit"
     },
     "ExpectedMessage": {
-        "ExpectedText": "Thanks for contacting us! We will get in touch with you shortly.",
-        "ClassName": "gform_confirmation_message_1 gform_confirmation_message",
-        "ID": "gform_confirmation_message_1",
+        "ExpectedText": "Thank you!",
+        "ClassName": "form-submission-text",
+        "ID": "yui_3_17_2_1",
         "Name": "",
         "TagName": "div"
     }

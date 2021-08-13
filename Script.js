@@ -142,7 +142,7 @@ const waitTillHTMLRendered = async(page, timeout = 30000) => {
                     var ColumInfoClassAndID = Fields["Col" + AI];
                     var ColumInfoData = item[AI];
                     if (ColumInfoClassAndID != null) {
-                        var Selector = (ColumInfoClassAndID["ID"] == "" ? "" : ("#" + ColumInfoClassAndID["ID"])) + (ColumInfoClassAndID["ClassName"] == "" ? "" : ("." + ColumInfoClassAndID["ClassName"])) + (ColumInfoClassAndID["Name"] == "" ? "" : ("[name=\"" + ColumInfoClassAndID["Name"] + "\"]"));
+                        var Selector = (ColumInfoClassAndID["ID"] == "" ? "" : ("#" + ColumInfoClassAndID["ID"])) + (ColumInfoClassAndID["ClassName"] == "" ? "" : ("." + ColumInfoClassAndID["ClassName"])) + (ColumInfoClassAndID["Name"] == "" ? "" : ("[name=\"" + ColumInfoClassAndID["Name"] + "\"]") + (ColumInfoClassAndID["Type"] == "" ? "" : ("[type=\"" + ColumInfoClassAndID["Type"] + "\"]")));
                         await page.type(Selector, ColumInfoData);
                     }
                 }
@@ -198,7 +198,7 @@ const waitTillHTMLRendered = async(page, timeout = 30000) => {
                     var ColumInfoClassAndID = Fields["Col" + AI];
                     var ColumInfoData = item[AI];
                     if (ColumInfoClassAndID != null) {
-                        var Selector = (ColumInfoClassAndID["ID"] == "" ? "" : ("#" + ColumInfoClassAndID["ID"])) + (ColumInfoClassAndID["ClassName"] == "" ? "" : ("." + ColumInfoClassAndID["ClassName"])) + (ColumInfoClassAndID["Name"] == "" ? "" : ("[name=\"" + ColumInfoClassAndID["Name"] + "\"]"));
+                        var Selector = (ColumInfoClassAndID["ID"] == "" ? "" : ("#" + ColumInfoClassAndID["ID"])) + (ColumInfoClassAndID["ClassName"] == "" ? "" : ("." + ColumInfoClassAndID["ClassName"])) + (ColumInfoClassAndID["Name"] == "" ? "" : ("[name=\"" + ColumInfoClassAndID["Name"] + "\"]") + (ColumInfoClassAndID["Type"] == "" ? "" : ("[type=\"" + ColumInfoClassAndID["Type"] + "\"]")));
                         await page.type(Selector, ColumInfoData);
                     }
                 }
