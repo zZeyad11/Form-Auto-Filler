@@ -183,7 +183,7 @@ const waitTillHTMLRendered = async(page, timeout = 30000) => {
     } else {
         while (RandomDone.length <= parseInt(MaxSubmits)) {
             try {
-                var Q = 0;
+                var Q = getRandomInt(StartingOffset, arr.length);
                 while (RandomDone.includes(Q)) {
                     Q = getRandomInt(StartingOffset, arr.length);
                 }
