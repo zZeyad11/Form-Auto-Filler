@@ -41,8 +41,9 @@
     },
     "ExpectedMessage": {
         "ExpectedText": "Thanks for contacting us! We will get in touch with you shortly.",
-        "ClassName": "",
-        "ID": "",
-        "Name": ""
+        "ClassName": "gform_confirmation_message_1 gform_confirmation_message",
+        "ID": "gform_confirmation_message_1",
+        "Name": "",
+        "TagName": "div"
     }
 }
