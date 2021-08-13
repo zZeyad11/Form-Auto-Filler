@@ -64,7 +64,7 @@ function requestCaptchaResults(apiKey, requestId) {
 const timeout = millis => new Promise(resolve => setTimeout(resolve, millis));
 var arr = [];
 var RandomDone = [];
-var CurrentRow = 0; // Zero Equals The first Line using Zero-Indexing System based
+var CurrentRow = 0;
 var stream = require("fs").createReadStream(CSV_File_Path);
 var reader = require("readline").createInterface({ input: stream });
 reader.on("line", (row) => {
@@ -139,7 +139,6 @@ const waitTillHTMLRendered = async(page, timeout = 30000) => {
                     break;
                 }
                 for (let AI = 0; AI < item.length; AI++) {
-
                     var ColumInfoClassAndID = Fields["Col" + AI];
                     var ColumInfoData = item[AI];
                     if (ColumInfoClassAndID != null) {
@@ -171,7 +170,7 @@ const waitTillHTMLRendered = async(page, timeout = 30000) => {
                         continue;
                     }
                 }
-                await timeout(parseInt(DelayTimeInSec) * 1000); //Waits for Time , Set in The json File
+                await timeout(parseInt(DelayTimeInSec) * 1000);
             } catch (exception) {
                 console.log("Failed In Captcha solving of Row Num: " + CurrentRow);
                 console.log(exception.stack);
