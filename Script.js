@@ -126,7 +126,7 @@ const waitTillHTMLRendered = async(page, timeout = 30000) => {
     const browser = await puppeteer.launch(chromeOptions);
     const page = await getActivePage(browser, 1000);
     if (!IsRandom) {
-        for (let Q = 0; Q < arr.length; Q++) {
+        for (let Q = StartingOffset; Q < arr.length; Q++) {
             try {
                 CurrentRow = Q;
                 if (CurrentRow < StartingOffset) {
@@ -185,7 +185,7 @@ const waitTillHTMLRendered = async(page, timeout = 30000) => {
             try {
                 var Q = 0;
                 while (RandomDone.includes(Q)) {
-                    Q = getRandomInt(0, arr.length);
+                    Q = getRandomInt(StartingOffset, arr.length);
                 }
                 CurrentRow = Q;
                 if (CurrentRow < StartingOffset) {

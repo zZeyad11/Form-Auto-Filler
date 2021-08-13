@@ -5,7 +5,7 @@
     "CSV_File_Path": "Ex1.csv",
     "DelayTimeInSec": 10,
     "MaxSubmits": 10,
-    "StartingOffset": 0,
+    "StartingOffset": 5,
     "Is_Random": true,
     "Fields": {
         "Col0": {
