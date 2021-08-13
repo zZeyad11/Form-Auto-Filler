@@ -128,16 +128,17 @@ const waitTillHTMLRendered = async(page, timeout = 30000) => {
     if (!IsRandom) {
         for (let Q = 0; Q < arr.length; Q++) {
             try {
-                CurrentRow = Q;
-                await page.goto(Page_Url);
-                await waitTillHTMLRendered(page);
-                var item = arr[Q];
+
                 if (CurrentRow < StartingOffset) {
                     continue;
                 }
                 if (MaxSubmits - 1 == CurrentRow) {
                     break;
                 }
+                CurrentRow = Q;
+                await page.goto(Page_Url);
+                await waitTillHTMLRendered(page);
+                var item = arr[Q];
                 for (let AI = 0; AI < item.length; AI++) {
                     var ColumInfoClassAndID = Fields["Col" + AI];
                     var ColumInfoData = item[AI];
@@ -187,12 +188,12 @@ const waitTillHTMLRendered = async(page, timeout = 30000) => {
                     Q = getRandomInt(0, arr.length);
                 }
                 CurrentRow = Q;
-                await page.goto(Page_Url);
-                await waitTillHTMLRendered(page);
-                var item = arr[Q];
                 if (CurrentRow < StartingOffset) {
                     continue;
                 }
+                await page.goto(Page_Url);
+                await waitTillHTMLRendered(page);
+                var item = arr[Q];
                 for (let AI = 0; AI < item.length; AI++) {
 
                     var ColumInfoClassAndID = Fields["Col" + AI];
