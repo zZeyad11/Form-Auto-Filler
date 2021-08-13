@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer');
 const request = require('request-promise-native');
 const poll = require('promise-poller').default;
+const DomParser = require('dom-parser')
 
 
 
@@ -160,6 +161,8 @@ const waitTillHTMLRendered = async(page, timeout = 30000) => {
     }
 };
 
+
+
 (async function main() {
     const response = await request.post('http://2captcha.com/in.php', { form: formData });
     //GlobalDebug(false);
@@ -168,7 +171,7 @@ const waitTillHTMLRendered = async(page, timeout = 30000) => {
     const browser = await puppeteer.launch(chromeOptions);
     // const page = await browser.newPage();
     const page = await getActivePage(browser, 1000);
-    await page.goto(Page_Url);
+
     //Reads Each Row In 
     if (!IsRandom) {
         for (let Q = 0; Q < arr.length; Q++) {
@@ -218,11 +221,12 @@ const waitTillHTMLRendered = async(page, timeout = 30000) => {
                 //GlobalDebug(true);
 
                 if (ExpectedMessage["ExpectedText"] != '') {
-                    const data = (await page.evaluate(() => document.querySelector('*').outerHTML)).toString().toLowerCase();
+                    var parser = new DomParser();
+                    var dom = parser.parseFromString((await page.evaluate(() => document.querySelector('*').outerHTML)));
+                    var texts = (dom.getElementsByClassName(ExpectedMessage["ClassName"])).map(e => e.textContent);
 
-                    var Bool = (data.includes("class=\"" + ExpectedMessage["ClassName"] + "\"") && data.includes("name=\"" + ExpectedMessage["Name"] + "\"") && data.includes("id=\"" + ExpectedMessage["ID"] + "\"")) || (data.includes("class=\"" + ExpectedMessage["ClassName"] + "\"") && data.includes("name=\"" + ExpectedMessage["Name"] + "\"")) || (data.includes("class=\"" + ExpectedMessage["ClassName"] + "\"") && data.includes("id=\"" + ExpectedMessage["ID"] + "\"")) || (data.includes("name=\"" + ExpectedMessage["Name"] + "\"") && data.includes("id=\"" + ExpectedMessage["ID"] + "\"")) || data.includes("class=\"" + ExpectedMessage["ClassName"] + "\"") || data.includes("id=\"" + ExpectedMessage["ID"] + "\"") || (data.includes("name=\"" + ExpectedMessage["Name"] + "\""));
 
-                    if (data.includes(ExpectedMessage["ExpectedText"]) && Bool) {
+                    if (texts.includes(ExpectedMessage["ExpectedText"]) && Bool) {
                         console.log("Done Row Num: " + CurrentRow);
                     } else {
                         console.log("Failed Row Num: " + CurrentRow);
@@ -230,6 +234,7 @@ const waitTillHTMLRendered = async(page, timeout = 30000) => {
                     }
 
                 }
+
 
                 await timeout(parseInt(DelayTimeInSec) * 1000); //Waits for Time , Set in The json File
             } catch (exception) {
@@ -243,6 +248,8 @@ const waitTillHTMLRendered = async(page, timeout = 30000) => {
     } else {
         while (RandomDone.length <= parseInt(MaxSubmits)) {
             try {
+
+
                 var Q = 0;
                 while (RandomDone.includes(Q)) {
                     Q = getRandomInt(0, arr.length);
@@ -252,9 +259,22 @@ const waitTillHTMLRendered = async(page, timeout = 30000) => {
                 //GlobalDebug(false);
                 await waitTillHTMLRendered(page);
 
+                var Selector = (ExpectedMessage["ID"] == "" ? "" : ("#" + ExpectedMessage["ID"])) + (ExpectedMessage["ClassName"] == "" ? "" : ("." + ExpectedMessage["ClassName"])) + (ExpectedMessage["Name"] == "" ? "" : ("[name=\"" + ExpectedMessage["Name"] + "\"]"));
+                // var C = "return Page.evaluate(() => document.querySelector(" + "'" + Selector + "'" + ").outerHTML);";
+                //const AsyncFunction = Object.getPrototypeOf(async function() {}).constructor;
 
+                // var F = new AsyncFunction("Page", "return Page.evaluate(() => document.querySelector(" + "'" + Selector + "'" + "));");
+
+                //var Q = await F(page);
+                // var Em = await eval(C);
 
                 //GlobalDebug(true);
+
+
+
+
+
+
                 //Type The data into its Fields According to The json File
                 var item = arr[Q];
                 if (CurrentRow < StartingOffset) {
@@ -294,11 +314,12 @@ const waitTillHTMLRendered = async(page, timeout = 30000) => {
 
 
                 if (ExpectedMessage["ExpectedText"] != '') {
-                    const data = (await page.evaluate(() => document.querySelector('*').outerHTML)).toString().toLowerCase();
+                    var parser = new DomParser();
+                    var dom = parser.parseFromString((await page.evaluate(() => document.querySelector('*').outerHTML)));
+                    var texts = (dom.getElementsByClassName(ExpectedMessage["ClassName"])).map(e => e.textContent);
 
-                    var Bool = (data.includes("class=\"" + ExpectedMessage["ClassName"] + "\"") && data.includes("name=\"" + ExpectedMessage["Name"] + "\"") && data.includes("id=\"" + ExpectedMessage["ID"] + "\"")) || (data.includes("class=\"" + ExpectedMessage["ClassName"] + "\"") && data.includes("name=\"" + ExpectedMessage["Name"] + "\"")) || (data.includes("class=\"" + ExpectedMessage["ClassName"] + "\"") && data.includes("id=\"" + ExpectedMessage["ID"] + "\"")) || (data.includes("name=\"" + ExpectedMessage["Name"] + "\"") && data.includes("id=\"" + ExpectedMessage["ID"] + "\"")) || data.includes("class=\"" + ExpectedMessage["ClassName"] + "\"") || data.includes("id=\"" + ExpectedMessage["ID"] + "\"") || (data.includes("name=\"" + ExpectedMessage["Name"] + "\""));
 
-                    if (data.includes(ExpectedMessage["ExpectedText"]) && Bool) {
+                    if (texts.includes(ExpectedMessage["ExpectedText"]) && Bool) {
                         console.log("Done Row Num: " + CurrentRow);
                     } else {
                         console.log("Failed Row Num: " + CurrentRow);
