@@ -7,7 +7,7 @@
     "MaxSubmits": 10,
     "StartingOffset": 2,
     "Is_Random": true,
-    "DelayResponse": 50000,
+    "DelayResponse": 25000,
     "Fields": {
         "Col0": {
             "ClassName": "",
