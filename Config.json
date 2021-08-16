@@ -7,41 +7,28 @@
     "MaxSubmits": 10,
     "StartingOffset": 2,
     "Is_Random": true,
+    "DelayResponse": 20000,
     "Fields": {
         "Col0": {
             "ClassName": "",
             "ID": "input_1_1_3",
             "Name": "input_1.3",
-            "Type": "",
-            "TagName": "div"
+            "Type": "text",
+            "TagName": "input"
         },
         "Col1": {
             "ClassName": "",
             "ID": "input_1_2",
             "Name": "input_2",
             "Type": "",
-            "TagName": "div"
+            "TagName": "input"
         },
         "Col2": {
             "ClassName": "",
             "ID": "input_1_8",
             "Name": "input_8",
             "Type": "",
-            "TagName": "div"
-        },
-        "Col3": {
-            "ClassName": "",
-            "ID": "input_1_11",
-            "Name": "input_11",
-            "Type": "",
-            "TagName": "div"
-        },
-        "Col4": {
-            "ClassName": "",
-            "ID": "input_1_9",
-            "Name": "input_9",
-            "Type": "",
-            "TagName": "div"
+            "TagName": "input"
         }
     },
     "SubmitButton": {

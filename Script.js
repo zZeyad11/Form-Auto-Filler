@@ -14,6 +14,8 @@ var StartingOffset = JsonData["StartingOffset"];
 var SubmitButton = JsonData["SubmitButton"];
 var ExpectedMessage = JsonData["ExpectedMessage"];
 var IsRandom = JsonData["Is_Random"];
+var DelayResponse = parseInt(JsonData["DelayResponse"]);
+
 const chromeOptions = {
     headless: false,
     defaultViewport: null,
@@ -41,7 +43,7 @@ async function initiateCaptchaRequest(apiKey) {
     const response = await request.post('http://2captcha.com/in.php', { form: formData });
     return JSON.parse(response).request;
 }
-async function pollForRequestResults(key, id, retries = 30, interval = 1500, delay = 15000) {
+async function pollForRequestResults(key, id, retries = 30, interval = 1500, delay = DelayResponse) {
     await timeout(delay);
     return poll({
         taskFn: requestCaptchaResults(key, id),
@@ -51,16 +53,20 @@ async function pollForRequestResults(key, id, retries = 30, interval = 1500, del
 }
 
 function requestCaptchaResults(apiKey, requestId) {
-    const url = `http://2captcha.com/res.php?key=${apiKey}&action=get&id=${requestId}&json=1`;
+    const url = `http://2captcha.com/res.php?key=${apiKey}&action=get&id=${requestId}&json=`;
     return async function() {
+        const rawResponse = await request.get(url);
+        const resp = JSON.parse(rawResponse);
         return new Promise(async function(resolve, reject) {
-            const rawResponse = await request.get(url);
-            const resp = JSON.parse(rawResponse);
             if (resp.status === 0) return reject(resp.request);
             resolve(resp.request);
         });
+
     }
 }
+
+
+
 const timeout = millis => new Promise(resolve => setTimeout(resolve, millis));
 var arr = [];
 var RandomDone = [];
