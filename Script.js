@@ -53,9 +53,9 @@ async function pollForRequestResults(key, id, retries = 30, interval = 1500, del
 }
 
 function requestCaptchaResults(apiKey, requestId) {
-    const url = `http://2captcha.com/res.php?key=${apiKey}&action=get&id=${requestId}&json=`;
+    const url = `http://2captcha.com/res.php?key=${apiKey}&action=get&id=${requestId}&json=1`;
     return async function() {
-        const rawResponse = await request.get(url);
+        var rawResponse = await request.get(url);
         const resp = JSON.parse(rawResponse);
         return new Promise(async function(resolve, reject) {
             if (resp.status === 0) return reject(resp.request);
